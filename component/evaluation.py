@@ -1,5 +1,5 @@
 import torch
-from configs import config_args
+from models.configs import config_args
 
 
 class Accumulator:
@@ -7,9 +7,9 @@ class Accumulator:
     Toy example:
         let n = 3:
             initialize: self.data = [0.0, 0.0, 0.0]
-            add(test_l, test_acc, length):  self.data = [0.0 + test_l, 0.0 + test_acc, 0.0 + length]
-            self.data[0] / self.data[2]: average loss
-            self.data[1] / self.data[2]: average accuracy
+            add(test_acc, test_l, length):  self.data = [0.0 + test_acc, 0.0 + test_l, 0.0 + length]
+            self.data[0] / self.data[2]: average accuracy
+            self.data[1] / self.data[2]: average loss
     """
     def __init__(self, n):
         self.data = [0.0] * n
@@ -22,6 +22,9 @@ class Accumulator:
 
     def __getitem__(self, idx):
         return self.data[idx]
+    
+    def get_acc_ls(self):
+        return self.data[0] / self.data[2], self.data[1] / self.data[2]
 
 
 def accuracy(y_hat, y):
@@ -37,6 +40,7 @@ def evaluate_accuracy(model, data_iter, loss=torch.nn.CrossEntropyLoss()):
     Calculate testing accuracy and testing loss in a testing dataset.
     """
     model.eval()
+    # acc loss len
     metric = Accumulator(3)
     for X, y in data_iter:
         X = X.to(config_args.device)
@@ -46,7 +50,7 @@ def evaluate_accuracy(model, data_iter, loss=torch.nn.CrossEntropyLoss()):
         test_l = loss(y_pred, y)
         metric.add(test_acc, test_l * len(y), len(y))
     model.train()
-    return metric[0] / metric[2], metric[1] / metric[2]
+    return metric.get_acc_ls()
 
 
 def evaluate_accuracy_hfl(client_model, mediator_model, data_iter, loss=torch.nn.CrossEntropyLoss()):
@@ -62,6 +66,6 @@ def evaluate_accuracy_hfl(client_model, mediator_model, data_iter, loss=torch.nn
         metric.add(test_acc, test_l * len(y), len(y))
     client_model.train()
     mediator_model.train()
-    return metric[0] / metric[2], metric[1] / metric[2]
+    return metric.get_acc_ls()
 
 

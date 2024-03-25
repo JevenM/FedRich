@@ -1,4 +1,4 @@
-from configs import config_args
+from models.configs import config_args
 from component.server import Server
 import torch
 import torch.nn as nn
@@ -96,6 +96,7 @@ class FedRichServer(Server):
         for k, client_id in enumerate(self.participants):
             weight = self.clients[client_id].participating_example_size / self.total_size
             for name, param in self.clients[client_id].local_model.state_dict().items():
+                # 感觉写的不对，多加了"0."前缀
                 aggregated_model[f'0.{name}'] = aggregated_model[f'0.{name}'] - \
                                                     global_lr * weight * (current_model[f'0.{name}'] - param.data)
             self.clients[client_id].local_model = None

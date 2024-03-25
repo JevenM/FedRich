@@ -1,5 +1,5 @@
 from component.client import Client
-from configs import config_args
+from models.configs import config_args
 from torch.utils.checkpoint import checkpoint
 import torch.optim as optim
 import copy

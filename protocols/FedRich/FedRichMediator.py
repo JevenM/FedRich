@@ -1,4 +1,4 @@
-from configs import config_args
+from models.configs import config_args
 from component.mediator import Mediator
 import torch
 import random

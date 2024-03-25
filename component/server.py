@@ -1,7 +1,7 @@
 import torch
 import os
 import re
-from configs import config_args
+from models.configs import config_args
 from models.create_model import create_model
 from component.evaluation import evaluate_accuracy
 

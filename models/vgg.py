@@ -1,5 +1,5 @@
 import torch.nn as nn
-from models.flattern import FlattenLayer
+from flattern import FlattenLayer
 
 cfg = {
     'A': [64,     'M', 128,      'M', 256, 256,           'M', 512, 512,           'M', 512, 512,           'M'],

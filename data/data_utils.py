@@ -4,7 +4,7 @@ import numpy as np
 import torchvision.transforms as transforms
 import scipy.stats
 from torch.utils.data.dataset import Dataset
-from configs import config_args
+from models.configs import config_args
 from scipy.stats import wasserstein_distance
 
 # -------------------------------------------------------------------------------------------------------
@@ -270,6 +270,7 @@ def JS_divergence(p, q):
 
 
 if __name__ == '__main__':
+    # mnist
     x_train, y_train, x_test, y_test = globals()['get_' + config_args.dataset]()
     splits = []
     split_image_data(x_train, y_train, n_clients=config_args.n_clients,
@@ -277,6 +278,7 @@ if __name__ == '__main__':
                      balancedness=config_args.balancedness,
                      verbose=True)
     splits = np.array(splits)
+    # 平均值
     global_dist = splits.sum(axis=0) / len(splits)
     heterogeneity = 0
     emds = []

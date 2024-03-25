@@ -1,5 +1,5 @@
 import torch.nn as nn
-from models.flattern import FlattenLayer
+from flattern import FlattenLayer
 
 
 class CNN(nn.Module):

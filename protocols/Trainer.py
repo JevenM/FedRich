@@ -1,7 +1,7 @@
 import time
 import os
 import torch
-from configs import config_args
+from models.configs import config_args
 
 
 class Trainer:
@@ -15,9 +15,14 @@ class Trainer:
         # save path
         localtime = time.localtime(time.time())
         path = f"{config_args.protocol}_{localtime[1]:02}{localtime[2]:02}{localtime[3]:02}{localtime[4]:02}"
+        # 新建文件夹saved_models
         saved_model_path = os.path.join('../saved_models', path)
+        if not os.path.exists(saved_model_path):
+            os.makedirs(saved_model_path)
+        # 新建文件夹results
         saved_results_path = os.path.join('../results', config_args.protocol)
-        res_path = os.path.join(saved_results_path, f"{config_args.dataset}_{path}.pt")
+        # 最终模型的权重文件
+        res_path = os.path.join(saved_model_path, f"{config_args.dataset}_{path}.pt")
         arg_path = os.path.join(saved_results_path, f"{config_args.dataset}_{path}.txt")
         if not os.path.exists(saved_results_path):
             os.makedirs(saved_results_path)
@@ -51,15 +56,12 @@ class Trainer:
 
             # save the model every args.record_step rounds
             if self.server.current_round % config_args.record_step == 0:
-                if not os.path.exists(saved_model_path):
-                    os.makedirs(saved_model_path)
                 torch.save(self.server.model,
                            os.path.join(saved_model_path,
                                         f"{config_args.protocol}"
                                         f"_round_{self.server.current_round}.pth"))
         # save the final results
         torch.save(self.results, res_path)
-
 
     def train_and_aggregate(self):
         pass

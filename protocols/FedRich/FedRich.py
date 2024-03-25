@@ -1,7 +1,7 @@
 import random
 import numpy as np
 from protocols.Trainer import Trainer
-from configs import config_args
+from models.configs import config_args
 from data.data_utils import get_data_loaders
 from protocols.FedRich.FedRichServer import FedRichServer
 from protocols.FedRich.FedRichMediator import FedRichMediator
@@ -19,7 +19,7 @@ class FedRichTrainer(Trainer):
                        in enumerate(zip(local_dataloaders, local_data_sizes))]
 
         # edges
-        mediator_num = config_args.mediator_num
+        mediator_num = config_args.mediator_num  # 3
         indices = list(range(len(all_clients)))
         random.shuffle(indices)
         num_for_mediator = None

@@ -1,6 +1,6 @@
 import torch
 import torch.optim as optim
-from configs import config_args
+from models.configs import config_args
 
 
 class Mediator:
