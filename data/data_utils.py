@@ -4,8 +4,6 @@ import numpy as np
 import torchvision.transforms as transforms
 import scipy.stats
 from torch.utils.data.dataset import Dataset
-import sys
-sys.path.insert(0, sys.path[0]+"/../")
 from models.configs import config_args
 from scipy.stats import wasserstein_distance
 
@@ -105,7 +103,6 @@ def split_image_data(data, labels, n_clients=10, classes_per_client=10,
         fracs /= np.sum(fracs)
         fracs = 0.1 / n_clients + (1 - 0.1) * fracs
         data_per_client = [np.floor(frac * n_data).astype('int') for frac in fracs]
-        print(f"data_per_client {data_per_client}")
         data_per_client = data_per_client[::-1]
         data_per_client_per_class = [np.maximum(1, nd // classes_per_client) for nd in data_per_client]
 
@@ -146,19 +143,10 @@ def split_image_data(data, labels, n_clients=10, classes_per_client=10,
 
     def print_split():
         print("Data split:")
-        total_num = 0
         for i, client in enumerate(clients_split):
-            # (1, 228)
-            # (10, 1)
-            # (10, 228)
-            # print(client[1].reshape(1, -1).shape)
-            # print(np.arange(n_labels).reshape(-1, 1).shape)
-            # print((client[1].reshape(1, -1) == np.arange(n_labels).reshape(-1, 1)).shape)
             split = np.sum(client[1].reshape(1, -1) == np.arange(n_labels).reshape(-1, 1), axis=1)
             print(" - Client {}: {}".format(i, split))
-            total_num += split.sum()
-            # break
-        print(f"total_num of allocated {total_num}, gt num of all data {len(labels)}")
+        print()
 
     if verbose:
         print_split()
@@ -285,14 +273,11 @@ if __name__ == '__main__':
     # mnist
     x_train, y_train, x_test, y_test = globals()['get_' + config_args.dataset]()
     splits = []
-    # WARNING 这里原始代码跑不通，下面是我自己修改并调试通过的代码
-    client_splits = split_image_data(x_train, y_train, n_clients=config_args.n_clients,
+    split_image_data(x_train, y_train, n_clients=config_args.n_clients,
                      classes_per_client=config_args.classes_per_client,
                      balancedness=config_args.balancedness,
                      verbose=True)
-    splits = [x[0] for x, y in client_splits]
-    splits = np.array(splits).reshape(len(splits), -1)
-    print(splits)
+    splits = np.array(splits)
     # 平均值
     global_dist = splits.sum(axis=0) / len(splits)
     heterogeneity = 0
@@ -308,5 +293,4 @@ if __name__ == '__main__':
         for split, emd in zip(splits, emds):
             heterogeneity += (JS_divergence(split, global_dist) + emd / d_max)
     heterogeneity /= len(splits)
-    # Heterogeneity:  1.0127784065521914
     print('Heterogeneity: ', heterogeneity)
